@@ -79,7 +79,7 @@ async function fetchImage(url) {
     const response = await fetch(url, {
       signal: controller.signal,
       headers: {
-        "user-agent": "hangry-image-generator"
+        "user-agent": "profile-pair-image-generator"
       }
     });
 
@@ -123,11 +123,11 @@ function getPercent(value) {
 
 function shipCenter(percent, fallback) {
   if (percent === 69) {
-    return { main: "69%", icon: "🔥" };
+    return { main: "69%", icon: "fire" };
   }
 
   if (percent === 110) {
-    return { main: "110%", icon: "❤️‍🔥" };
+    return { main: "110%", icon: "heartFire" };
   }
 
   if (percent !== null) {
@@ -135,6 +135,29 @@ function shipCenter(percent, fallback) {
   }
 
   return { main: fallback, icon: "" };
+}
+
+function iconSvg(type) {
+  if (type === "fire") {
+    return `
+      <g transform="translate(463 164) scale(0.9)">
+        <path d="M42 92 C18 72 18 44 38 23 C37 43 52 48 54 66 C67 51 64 30 51 8 C86 30 98 62 78 92 C69 106 51 112 42 92 Z" fill="#f97316"/>
+        <path d="M51 96 C38 83 42 65 54 52 C56 65 69 68 65 88 C63 100 55 106 51 96 Z" fill="#fde047"/>
+      </g>
+    `;
+  }
+
+  if (type === "heartFire") {
+    return `
+      <g transform="translate(454 160)">
+        <path d="M46 98 C14 72 0 52 8 30 C14 12 35 10 46 25 C57 10 78 12 84 30 C92 52 78 72 46 98 Z" fill="#dc2626"/>
+        <path d="M52 80 C36 67 39 48 52 34 C52 48 65 51 63 66 C72 56 70 41 62 26 C86 43 89 68 72 84 C64 91 56 92 52 80 Z" fill="#f97316"/>
+        <path d="M60 79 C53 70 56 60 64 52 C65 60 72 63 69 73 C67 82 62 84 60 79 Z" fill="#fde047"/>
+      </g>
+    `;
+  }
+
+  return "";
 }
 
 function cobwebSvg() {
@@ -146,7 +169,17 @@ function cobwebSvg() {
   `;
 }
 
-function overlaySvg(leftName, rightName, theme, percent) {
+function backgroundSvg(theme) {
+  return Buffer.from(`
+    <svg width="${WIDTH}" height="${HEIGHT}" viewBox="0 0 ${WIDTH} ${HEIGHT}" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="${WIDTH}" height="${HEIGHT}" fill="${theme.background}"/>
+      <rect x="16" y="20" width="968" height="480" rx="18" fill="${theme.panel}" stroke="${theme.border}" stroke-width="8"/>
+      ${theme.cobweb ? cobwebSvg() : ""}
+    </svg>
+  `);
+}
+
+function frameSvg(leftName, rightName, theme, percent) {
   const left = escapeXml(leftName);
   const right = escapeXml(rightName);
   const title = escapeXml(theme.title);
@@ -154,8 +187,6 @@ function overlaySvg(leftName, rightName, theme, percent) {
     ? shipCenter(percent, theme.center)
     : { main: theme.center, icon: "" };
   const center = escapeXml(centerContent.main);
-  const icon = escapeXml(centerContent.icon);
-  const showIcon = centerContent.icon ? "block" : "none";
   const centerY = centerContent.icon ? 306 : 278;
 
   return Buffer.from(`
@@ -170,16 +201,12 @@ function overlaySvg(leftName, rightName, theme, percent) {
         </filter>
       </defs>
 
-      <rect x="0" y="0" width="${WIDTH}" height="${HEIGHT}" fill="${theme.background}"/>
-      <rect x="16" y="20" width="968" height="480" rx="18" fill="${theme.panel}" stroke="${theme.border}" stroke-width="8"/>
-      ${theme.cobweb ? cobwebSvg() : ""}
-
       <rect x="${LEFT_X - 8}" y="${AVATAR_Y - 8}" width="${AVATAR_SIZE + 16}" height="${AVATAR_SIZE + 16}" rx="8" fill="none" stroke="${theme.border}" stroke-width="10" filter="url(#glow)"/>
       <rect x="${RIGHT_X - 8}" y="${AVATAR_Y - 8}" width="${AVATAR_SIZE + 16}" height="${AVATAR_SIZE + 16}" rx="8" fill="none" stroke="${theme.border}" stroke-width="10" filter="url(#glow)"/>
 
       <rect x="486" y="28" width="28" height="464" rx="10" fill="${theme.divider}" filter="url(#glow)"/>
       <rect x="492" y="36" width="16" height="448" rx="7" fill="${theme.background}"/>
-      <text x="500" y="228" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="62" font-weight="900" display="${showIcon}">${icon}</text>
+      ${iconSvg(centerContent.icon)}
       <text x="500" y="${centerY}" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="900" fill="${theme.accent}" filter="url(#glow)">${center}</text>
 
       <rect x="38" y="410" width="420" height="52" fill="${theme.background}" opacity="0.82"/>
@@ -220,9 +247,10 @@ export default async function handler(req, res) {
       }
     })
       .composite([
+        { input: backgroundSvg(theme), left: 0, top: 0 },
         { input: leftAvatar, left: LEFT_X, top: AVATAR_Y },
         { input: rightAvatar, left: RIGHT_X, top: AVATAR_Y },
-        { input: overlaySvg(leftName, rightName, theme, percent), left: 0, top: 0 }
+        { input: frameSvg(leftName, rightName, theme, percent), left: 0, top: 0 }
       ])
       .png()
       .toBuffer();
