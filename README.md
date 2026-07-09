@@ -10,7 +10,7 @@ It creates a PNG from two Discord avatar URLs:
 https://your-vercel-site.vercel.app/api/pair?left=AVATAR_URL&right=AVATAR_URL&leftName=Alice&rightName=Bob&theme=mystery
 ```
 
-The result is a dark image with two avatars, framed panels, and a center divider. You can use different themes:
+The result is a simple image with two avatars and a narrow middle strip. You can use different themes:
 
 ```text
 theme=mystery
@@ -26,8 +26,8 @@ The shipping theme can also show a percentage on the image:
 
 Special ship results:
 
-- `69%` shows a fire emoji in the middle divider.
-- `110%` shows a heart-on-fire emoji in the middle divider.
+- `69%` shows `FIRE` at the top of the middle strip.
+- `110%` shows `MAX` at the top of the middle strip.
 
 `/api/hangry` still works too, but `/api/pair` is the better name for your commands.
 
