@@ -109,21 +109,11 @@ function middleStripSvg(theme, percent) {
 
       ${isMystery ? `
         <text x="${STRIP_X + 36}" y="120" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="900" fill="#ffffff">VS</text>
-      ` : `
-        <g stroke="#8a8a8a" stroke-width="1" opacity="0.75">
-          <line x1="${STRIP_X}" y1="56" x2="${STRIP_X + 19}" y2="56"/>
-          <line x1="${STRIP_X + 53}" y1="56" x2="${STRIP_X + STRIP_WIDTH}" y2="56"/>
-          <line x1="${STRIP_X}" y1="110" x2="${STRIP_X + 19}" y2="110"/>
-          <line x1="${STRIP_X + 53}" y1="110" x2="${STRIP_X + STRIP_WIDTH}" y2="110"/>
-        </g>
-
-        <text x="${STRIP_X + 36}" y="61" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#bdbdbd">75</text>
-        <text x="${STRIP_X + 36}" y="115" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="14" font-weight="700" fill="#bdbdbd">50</text>
-      `}
+      ` : ""}
 
       ${showPercent ? `
-        <rect x="${STRIP_X}" y="158" width="${STRIP_WIDTH}" height="62" fill="${theme.accent}"/>
-        <text x="${STRIP_X + 36}" y="199" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="900" fill="${theme.text}">${percent}%</text>
+        <rect x="${STRIP_X}" y="0" width="${STRIP_WIDTH}" height="${HEIGHT}" fill="${theme.accent}"/>
+        <text x="${STRIP_X + 36}" y="122" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="900" fill="${theme.text}">${percent}%</text>
       ` : ""}
     </svg>
   `);
@@ -134,10 +124,7 @@ export default async function handler(req, res) {
     const leftUrl = validateDiscordImageUrl(req.query.left, "left");
     const rightUrl = validateDiscordImageUrl(req.query.right, "right");
     const theme = getTheme(req.query.theme);
-    const givenPercent = getPercent(req.query.percent);
-    const percent = theme.title === "SHIP" && givenPercent === null
-      ? Math.floor(Math.random() * 111)
-      : givenPercent;
+    const percent = getPercent(req.query.percent);
 
     const [leftRaw, rightRaw] = await Promise.all([
       fetchImage(leftUrl),
