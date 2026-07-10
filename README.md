@@ -18,16 +18,11 @@ theme=ship
 theme=duel
 ```
 
-The shipping theme can also show a percentage on the image:
+The shipping theme can show a percentage on the image. If you leave `percent` out, the generator chooses a random number from `0` to `110`.
 
 ```text
 &theme=ship&percent=69
 ```
-
-Special ship results:
-
-- `69%` shows `FIRE` at the top of the middle strip.
-- `110%` shows `MAX` at the top of the middle strip.
 
 `/api/hangry` still works too, but `/api/pair` is the better name for your commands.
 
@@ -107,13 +102,11 @@ Create a command trigger named `ship`, then paste this:
 {{$base := "https://your-project-name.vercel.app"}}
 {{$avatar1 := $u1.AvatarURL "512"}}
 {{$avatar2 := $u2.AvatarURL "512"}}
-{{$percent := randInt 0 111}}
-
-{{$image := print $base "/api/pair?left=" (urlquery $avatar1) "&right=" (urlquery $avatar2) "&leftName=" (urlquery $u1.Username) "&rightName=" (urlquery $u2.Username) "&theme=ship&percent=" $percent}}
+{{$image := print $base "/api/pair?left=" (urlquery $avatar1) "&right=" (urlquery $avatar2) "&leftName=" (urlquery $u1.Username) "&rightName=" (urlquery $u2.Username) "&theme=ship&v=" currentTime.UnixNano}}
 
 {{sendMessage nil (cembed
   "title" "Ship Check"
-  "description" (print "**" $u1.Username "** + **" $u2.Username "** = **" $percent "%**")
+  "description" (print "**" $u1.Username "** + **" $u2.Username "**")
   "color" 16732067
   "image" (sdict "url" $image)
 )}}
