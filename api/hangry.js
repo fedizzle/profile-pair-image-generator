@@ -120,8 +120,8 @@ function percentSvg(value, x, y, scale, color) {
 
 function vsSvg(x, y, color) {
   return `
-    <path d="M${x - 25} ${y - 21} L${x - 13} ${y + 21} L${x - 1} ${y - 21}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M${x + 27} ${y - 19} C${x + 10} ${y - 25} ${x + 10} ${y - 2} ${x + 25} ${y} C${x + 45} ${y + 3} ${x + 40} ${y + 24} ${x + 13} ${y + 16}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round"/>
+    <path d="M${x - 27} ${y - 19} L${x - 18} ${y + 19} L${x - 9} ${y - 19}" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M${x + 21} ${y - 17} C${x + 7} ${y - 22} ${x + 7} ${y - 2} ${x + 20} ${y} C${x + 36} ${y + 3} ${x + 32} ${y + 22} ${x + 10} ${y + 15}" fill="none" stroke="${color}" stroke-width="6" stroke-linecap="round"/>
   `;
 }
 
