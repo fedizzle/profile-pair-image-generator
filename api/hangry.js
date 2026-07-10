@@ -7,6 +7,7 @@ const LEFT_X = 0;
 const STRIP_X = 220;
 const STRIP_WIDTH = 72;
 const RIGHT_X = 292;
+const FONT_STACK = "DejaVu Sans, Arial, Helvetica, sans-serif";
 
 const THEMES = {
   ship: {
@@ -108,12 +109,12 @@ function middleStripSvg(theme, percent) {
       <rect x="${STRIP_X}" y="0" width="${STRIP_WIDTH}" height="${HEIGHT}" fill="${theme.strip}"/>
 
       ${isMystery ? `
-        <text x="${STRIP_X + 36}" y="120" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="28" font-weight="900" fill="#ffffff">VS</text>
+        <text x="${STRIP_X + 36}" y="120" text-anchor="middle" font-family="${FONT_STACK}" font-size="28" font-weight="900" fill="#ffffff">VS</text>
       ` : ""}
 
       ${showPercent ? `
         <rect x="${STRIP_X}" y="0" width="${STRIP_WIDTH}" height="${HEIGHT}" fill="${theme.accent}"/>
-        <text x="${STRIP_X + 36}" y="122" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="29" font-weight="900" fill="${theme.text}">${percent}%</text>
+        <text x="${STRIP_X + 36}" y="122" text-anchor="middle" font-family="${FONT_STACK}" font-size="29" font-weight="900" fill="${theme.text}">${percent}%</text>
       ` : ""}
     </svg>
   `);
