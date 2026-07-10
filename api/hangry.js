@@ -7,7 +7,6 @@ const LEFT_X = 0;
 const STRIP_X = 220;
 const STRIP_WIDTH = 72;
 const RIGHT_X = 292;
-const FONT_STACK = "DejaVu Sans, Arial, Helvetica, sans-serif";
 
 const THEMES = {
   ship: {
@@ -63,6 +62,69 @@ function getPercent(value) {
   return Math.max(0, Math.min(110, number));
 }
 
+const DIGITS = {
+  0: ["a", "b", "c", "d", "e", "f"],
+  1: ["b", "c"],
+  2: ["a", "b", "g", "e", "d"],
+  3: ["a", "b", "g", "c", "d"],
+  4: ["f", "g", "b", "c"],
+  5: ["a", "f", "g", "c", "d"],
+  6: ["a", "f", "g", "c", "d", "e"],
+  7: ["a", "b", "c"],
+  8: ["a", "b", "c", "d", "e", "f", "g"],
+  9: ["a", "b", "c", "d", "f", "g"]
+};
+
+function digitSvg(digit, x, y, scale, color) {
+  const segments = DIGITS[digit] || [];
+  const t = 4 * scale;
+  const w = 24 * scale;
+  const h = 42 * scale;
+  const mid = y + h / 2 - t / 2;
+  const rects = {
+    a: [x + t, y, w - t * 2, t],
+    b: [x + w - t, y + t, t, h / 2 - t],
+    c: [x + w - t, mid + t, t, h / 2 - t],
+    d: [x + t, y + h - t, w - t * 2, t],
+    e: [x, mid + t, t, h / 2 - t],
+    f: [x, y + t, t, h / 2 - t],
+    g: [x + t, mid, w - t * 2, t]
+  };
+
+  return segments.map((segment) => {
+    const [rx, ry, rw, rh] = rects[segment];
+    return `<rect x="${rx}" y="${ry}" width="${rw}" height="${rh}" rx="${t / 2}" fill="${color}"/>`;
+  }).join("");
+}
+
+function percentSvg(value, x, y, scale, color) {
+  const chars = String(value).split("");
+  const digitWidth = 28 * scale;
+  const percentWidth = 17 * scale;
+  const totalWidth = chars.length * digitWidth + percentWidth;
+  let cursor = x - totalWidth / 2;
+  const parts = chars.map((char) => {
+    const svg = digitSvg(char, cursor, y, scale, color);
+    cursor += digitWidth;
+    return svg;
+  });
+
+  parts.push(`
+    <circle cx="${cursor + 4 * scale}" cy="${y + 8 * scale}" r="${3 * scale}" fill="${color}"/>
+    <circle cx="${cursor + 14 * scale}" cy="${y + 34 * scale}" r="${3 * scale}" fill="${color}"/>
+    <line x1="${cursor + 16 * scale}" y1="${y + 4 * scale}" x2="${cursor + 2 * scale}" y2="${y + 39 * scale}" stroke="${color}" stroke-width="${3 * scale}" stroke-linecap="round"/>
+  `);
+
+  return parts.join("");
+}
+
+function vsSvg(x, y, color) {
+  return `
+    <path d="M${x - 25} ${y - 21} L${x - 13} ${y + 21} L${x - 1} ${y - 21}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M${x + 27} ${y - 19} C${x + 10} ${y - 25} ${x + 10} ${y - 2} ${x + 25} ${y} C${x + 45} ${y + 3} ${x + 40} ${y + 24} ${x + 13} ${y + 16}" fill="none" stroke="${color}" stroke-width="7" stroke-linecap="round"/>
+  `;
+}
+
 async function fetchImage(url) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 6000);
@@ -109,12 +171,12 @@ function middleStripSvg(theme, percent) {
       <rect x="${STRIP_X}" y="0" width="${STRIP_WIDTH}" height="${HEIGHT}" fill="${theme.strip}"/>
 
       ${isMystery ? `
-        <text x="${STRIP_X + 36}" y="120" text-anchor="middle" font-family="${FONT_STACK}" font-size="28" font-weight="900" fill="#ffffff">VS</text>
+        ${vsSvg(STRIP_X + 36, 110, "#ffffff")}
       ` : ""}
 
       ${showPercent ? `
         <rect x="${STRIP_X}" y="0" width="${STRIP_WIDTH}" height="${HEIGHT}" fill="${theme.accent}"/>
-        <text x="${STRIP_X + 36}" y="122" text-anchor="middle" font-family="${FONT_STACK}" font-size="29" font-weight="900" fill="${theme.text}">${percent}%</text>
+        ${percentSvg(percent, STRIP_X + 36, 89, 0.82, theme.text)}
       ` : ""}
     </svg>
   `);
